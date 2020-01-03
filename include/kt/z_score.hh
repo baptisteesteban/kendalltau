@@ -12,7 +12,7 @@ namespace kt
   namespace internals
   {
     template <typename T>
-    std::size_t vx(std::shared_ptr<histogram<T>> x);
+    float vx(std::shared_ptr<histogram<T>> x);
 
     template <typename T>
     float v1(std::shared_ptr<histogram<T>> t, std::shared_ptr<histogram<T>> u,
@@ -37,13 +37,13 @@ namespace kt
   namespace internals
   {
     template <typename T>
-    std::size_t vx(std::shared_ptr<histogram<T>> x)
+    float vx(std::shared_ptr<histogram<T>> x)
     {
-      std::size_t res = 0;
+      float res = 0;
       for (std::size_t i = 0; i < x->h.size(); i++)
       {
-        T e = x->h[i];
-        res += e * (e - 1) * (2 * e + 5);
+        std::size_t e = x->h[i];
+        res += static_cast<float>(e * (e - 1) * (2 * e + 5));
       }
       return res;
     }
@@ -99,21 +99,24 @@ namespace kt
     std::size_t nd = 0;
     for (std::size_t i = 0; i < n; i++)
     {
-      for (std::size_t j = i - 1; j > -1; j--)
+      for (int j = i - 1; j > -1; j--)
       {
+        std::cout << "(i = " << i << ", j = " << j << ")\n";
         T xi = arr1->data[i];
         T xj = arr1->data[j];
         T yi = arr2->data[i];
         T yj = arr2->data[j];
 
-        if ((xi > xj && yi > yj) || (xi < xj && yi < yj))
+        if ((xi > xj && yi > yj) || (xi < xj && yi < yj))  
           nc++;
+       
 
         if ((xi > xj && yi < yj) || (xi < xj && yi > yj))
           nd++;
       }
     }
 
+    std::cout << "nd = " << nd << " nc = " << nc << "\n";
     return (nc - nd) / std::sqrt(internals::v(t, u, n));
   }
 } // namespace kt
