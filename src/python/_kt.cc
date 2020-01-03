@@ -2,7 +2,9 @@
 
 #include <kt/z_score.hh>
 
-#include <iostream>
+#include <cstddef>
+
+#define BIND(T) m.def("z_score", &z_score_python<T>)
 
 namespace kt
 {
@@ -18,6 +20,20 @@ namespace kt
         return z_score(tab1, tab2);
       }
 
-      PYBIND11_MODULE(_kt, m) { m.def("z_score", &z_score_python<int>); }
+      PYBIND11_MODULE(_kt, m) 
+      { 
+        BIND(int);
+        BIND(float);
+        BIND(double);
+        BIND(unsigned);
+        BIND(std::uint8_t);
+        BIND(std::uint16_t);
+        BIND(std::uint32_t);
+        BIND(std::uint64_t);
+        BIND(std::int8_t);
+        BIND(std::int16_t);
+        BIND(std::int32_t);
+        BIND(std::int64_t);
+      }
     }
 }
