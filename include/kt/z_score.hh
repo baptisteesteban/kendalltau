@@ -4,6 +4,8 @@
 #include <kt/histogram.hh>
 #include <kt/table.hh>
 
+#include <cmath>
+
 namespace kt
 {
   template <typename T>
@@ -80,7 +82,7 @@ namespace kt
             std::size_t n)
     {
       float v0 = n * (n - 1) * (2 * n + 5);
-      return (v0 - vx(t) - vx(u)) / 18 + v1(t, u, n) + v2(t, u, n);
+      return (v0 - vx(t) - vx(u)) / 18.f + v1(t, u, n) + v2(t, u, n);
     }
   } // namespace internals
 
@@ -95,13 +97,12 @@ namespace kt
     auto        t = make_histogram(arr1);
     auto        u = make_histogram(arr2);
 
-    std::size_t nc = 0;
-    std::size_t nd = 0;
+    int nc = 0;
+    int nd = 0;
     for (std::size_t i = 0; i < n; i++)
     {
       for (int j = i - 1; j > -1; j--)
       {
-        std::cout << "(i = " << i << ", j = " << j << ")\n";
         T xi = arr1->data[i];
         T xj = arr1->data[j];
         T yi = arr2->data[i];
@@ -116,8 +117,7 @@ namespace kt
       }
     }
 
-    std::cout << "nd = " << nd << " nc = " << nc << "\n";
-    return (nc - nd) / std::sqrt(internals::v(t, u, n));
+    return static_cast<float>(nc - nd) / std::sqrt(internals::v(t, u, n));
   }
 } // namespace kt
 
