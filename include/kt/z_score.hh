@@ -4,6 +4,7 @@
 #include <kt/histogram.hh>
 #include <kt/table.hh>
 
+
 #include <cmath>
 
 namespace kt
@@ -99,6 +100,7 @@ namespace kt
 
     int nc = 0;
     int nd = 0;
+
     for (std::size_t i = 0; i < n; i++)
     {
       for (int j = i - 1; j > -1; j--)
