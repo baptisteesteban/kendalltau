@@ -22,27 +22,6 @@ namespace kt
   template <typename T>
   std::ostream& operator<<(std::ostream& out, const table<T>& t);
 
-  template <typename T>
-  struct rgb_t
-  {
-    rgb_t(T cr = 0, T cg = 0, T cb = 0)
-      : r(cr)
-      , g(cg)
-      , b(cb)
-    {
-    }
-
-    T r;
-    T g;
-    T b;
-  };
-
-  template <typename T>
-  std::ostream& operator<<(std::ostream& out, const rgb_t<T>&);
-
-  template <typename T>
-  std::shared_ptr<table<rgb_t<T>>> uni_to_multi(std::shared_ptr<table<T>>);
-
   namespace python
   {
     namespace py = pybind11;
@@ -77,27 +56,6 @@ namespace kt
       out << t->data[i] << " ";
     out << t->data[t->capacity - 1] << "]\n";
     return out;
-  }
-
-
-  template <typename T>
-  std::ostream& operator<<(std::ostream& out, const rgb_t<T>& c)
-  {
-    out << "(" << c.r << ", " << c.g << ", " << c.b << ")";
-    return out;
-  }
-
-  template <typename T>
-  std::shared_ptr<table<rgb_t<T>>> uni_to_multi(std::shared_ptr<table<T>> t)
-  {
-    auto res = std::make_shared<table<rgb_t<T>>>(t->capacity / t->nb_elem, 1);
-    for (std::size_t i = 0; i < res->capacity; i++)
-    {
-      res->data[i].r = t->data[i * 3];
-      res->data[i].g = t->data[i * 3 + 1];
-      res->data[i].b = t->data[i * 3 + 2];
-    }
-    return res;
   }
 
   namespace python
