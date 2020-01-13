@@ -22,12 +22,30 @@ namespace kt
   template <typename T>
   std::ostream& operator<<(std::ostream& out, const table<T>& t);
 
+  template <typename T>
+  struct rgb_t
+  {
+    rgb_t(T cr = 0, T cg = 0, T cb = 0)
+      : r(cr)
+      , g(cg)
+      , b(cb)
+    {
+    }
+
+    T r;
+    T g;
+    T b;
+  };
+
+  template <typename T>
+  std::ostream& operator<<(std::ostream& out, const rgb_t<T>&);
+
+  template <typename T>
+  std::shared_ptr<table<rgb_t<T>>> uni_to_multi(std::shared_ptr<table<T>>);
+
   namespace python
   {
     namespace py = pybind11;
-
-    template <typename T>
-    py::array_t<T> to_numpy(std::shared_ptr<table<T>>);
 
     template <typename T>
     std::shared_ptr<table<T>> from_numpy(const py::array_t<T>&);
@@ -61,6 +79,27 @@ namespace kt
     return out;
   }
 
+
+  template <typename T>
+  std::ostream& operator<<(std::ostream& out, const rgb_t<T>& c)
+  {
+    out << "(" << c.r << ", " << c.g << ", " << c.b << ")";
+    return out;
+  }
+
+  template <typename T>
+  std::shared_ptr<table<rgb_t<T>>> uni_to_multi(std::shared_ptr<table<T>> t)
+  {
+    auto res = std::make_shared<table<rgb_t<T>>>(t->capacity / t->nb_elem, 1);
+    for (std::size_t i = 0; i < res->capacity; i++)
+    {
+      res->data[i].r = t->data[i * 3];
+      res->data[i].g = t->data[i * 3 + 1];
+      res->data[i].b = t->data[i * 3 + 2];
+    }
+    return res;
+  }
+
   namespace python
   {
     namespace py = pybind11;
@@ -68,10 +107,18 @@ namespace kt
     template <typename T>
     std::shared_ptr<table<T>> from_numpy(const py::array_t<T>& arr)
     {
+      // Buffer info from python
       auto r = arr.request();
-      if (r.ndim > 1)
+
+      std::size_t n_elem = 0;
+      if (r.ndim == 1)
+        n_elem = 1;
+      else if (r.ndim == 2 && r.shape[1] == 3)
+        n_elem = 3;
+      else
         throw std::runtime_error("Bad shapes");
-      auto res = std::make_shared<table<T>>(r.shape[0], 1);
+
+      auto res = std::make_shared<table<T>>(r.shape[0] * n_elem, n_elem);
 
       for (std::size_t i = 0; i < res->capacity; i++)
         res->data[i] = *(static_cast<T*>(r.ptr) + i);
