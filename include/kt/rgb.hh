@@ -2,6 +2,9 @@
 #define RGB_HH
 
 #include <memory>
+#include <ostream>
+
+#include <kt/table.hh>
 
 namespace kt
 {
@@ -116,4 +119,4 @@ namespace kt
 
 } // namespace kt
 
-#endif RGB_HH
+#endif /* !RGB_HH */
